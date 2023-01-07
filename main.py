@@ -8,8 +8,7 @@ import matplotlib.ticker as ticker
 from model import *
 from util import getMNIST, plotAccuracy
 
-
-def main():
+if __name__ == '__main__':
   model = Sequential()
   model.addLayer(ConvolutionLayer(1, 16))
   model.addLayer(ReLULayer())
@@ -71,7 +70,3 @@ def main():
 
   plotAccuracy('mini_train', epoch, train_acc)
   plotAccuracy('mini_test', epoch, test_acc)
-
-
-if __name__ == '__main__':
-  main()
