@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
-from layer import *
+from model import *
 from util import getMNIST, plotAccuracy
 
 
@@ -34,12 +34,11 @@ def main():
   test_loss = []
 
   batchsize = 100  # 100
-  n_train = 60000  # 60000
-  n_test = 10000  # 10000
+  n_train = 600  # 60000
+  n_test = 100  # 10000
   epoch = 5
 
   for e in range(1, epoch + 1):
-    print('epoch %d' % e)
     randinds = np.random.permutation(n_train)
     for it in range(0, n_train, batchsize):
       ind = randinds[it:it + batchsize]
@@ -50,8 +49,8 @@ def main():
       end = time.time()
       train_acc.append(acc)
       train_loss.append(loss)
-      print('train iteration %d, elapsed time %f, loss %f, acc %f' %
-            (it // batchsize, end - start, loss, acc))
+      print('[train] epoch %d, iteration %d, elapsed time %f, loss %f, acc %f' %
+            (e, it // batchsize, end - start, loss, acc))
 
     start = time.time()
     acc_ave = 0
@@ -67,7 +66,8 @@ def main():
     end = time.time()
     test_acc.append(acc_ave)
     test_loss.append(loss_ave)
-    print('test, elapsed time %f, loss %f, acc %f' % (end - start, loss_ave, acc_ave))
+    print('[test] epoch %d, elapsed time %f, loss %f, acc %f' %
+          (e, end - start, loss_ave, acc_ave))
 
   plotAccuracy('mini_train', epoch, train_acc)
   plotAccuracy('mini_test', epoch, test_acc)
