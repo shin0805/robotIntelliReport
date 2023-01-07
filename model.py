@@ -1,6 +1,5 @@
 import numpy as np
 from util import softmax, cross_entropy, softmax_cross_entropy
-import sys
 
 
 class Layer(object):
