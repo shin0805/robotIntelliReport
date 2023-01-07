@@ -1,5 +1,8 @@
 import os
+
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import pickle
 
 
@@ -29,3 +32,19 @@ def getMNIST(file_name):
   test_img = dataset['test_img']
   test_label = dataset['test_label']
   return (train_img, train_label), (test_img, test_label)
+
+
+def plotAccuracy(name, epoch, data):
+  plt.title(name + ' accuracy')
+  plt.xlabel('epoch')
+  plt.ylabel('accuracy')
+  plt.xlim([1, epoch])
+  plt.ylim([0, 1])
+  plt.gca().get_xaxis().set_major_locator(ticker.MaxNLocator(integer=True))
+  plt.plot(np.linspace(1, epoch, len(data)), data, 'r-')
+  plt.axhline(y=data[-1], color='black', linestyle='--')
+  plt.text(1.01, data[-1] + 0.01, str(data[-1]))
+  if not os.path.exists('picture'):
+    os.makedirs('picture')
+  plt.savefig(os.path.join('picture', name + '_accuracy.jpg'))
+  plt.clf()

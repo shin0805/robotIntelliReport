@@ -1,9 +1,12 @@
 import time
+import os
 
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 
 from layer import *
-from util import getMNIST
+from util import getMNIST, plotAccuracy
 
 
 def main():
@@ -25,12 +28,17 @@ def main():
 
   train, test = getMNIST('mnist.pkl')
 
-  batchsize = 100
-  n_train = 60000
-  n_test = 10000
+  train_acc = []
+  test_acc = []
+  train_loss = []
+  test_loss = []
+
+  batchsize = 100  # 100
+  n_train = 60000  # 60000
+  n_test = 10000  # 10000
   epoch = 5
 
-  for e in range(epoch):
+  for e in range(1, epoch + 1):
     print('epoch %d' % e)
     randinds = np.random.permutation(n_train)
     for it in range(0, n_train, batchsize):
@@ -40,22 +48,29 @@ def main():
       start = time.time()
       loss, acc = classifier.update(x, t)
       end = time.time()
+      train_acc.append(acc)
+      train_loss.append(loss)
       print('train iteration %d, elapsed time %f, loss %f, acc %f' %
             (it // batchsize, end - start, loss, acc))
 
     start = time.time()
-    acctest = 0
-    losstest = 0
+    acc_ave = 0
+    loss_ave = 0
     for it in range(0, n_test, batchsize):
       x = test[0][it:it + batchsize]
       t = test[1][it:it + batchsize]
       loss, acc = classifier.predict(x, t)
-      acctest += int(acc * batchsize)
-      losstest += loss
-    acctest /= (1.0 * n_test)
-    losstest /= (n_test // batchsize)
+      acc_ave += int(acc * batchsize)
+      loss_ave += loss
+    acc_ave /= (1.0 * n_test)
+    loss_ave /= (n_test // batchsize)
     end = time.time()
-    print('test, elapsed time %f, loss %f, acc %f' % (end - start, loss, acc))
+    test_acc.append(acc_ave)
+    test_loss.append(loss_ave)
+    print('test, elapsed time %f, loss %f, acc %f' % (end - start, loss_ave, acc_ave))
+
+  plotAccuracy('mini_train', epoch, train_acc)
+  plotAccuracy('mini_test', epoch, test_acc)
 
 
 if __name__ == '__main__':
