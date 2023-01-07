@@ -41,7 +41,7 @@ def plotAccuracy(name, epoch, data):
   plt.xlim([1, epoch])
   plt.ylim([0, 1])
   plt.gca().get_xaxis().set_major_locator(ticker.MaxNLocator(integer=True))
-  plt.plot(np.linspace(1, epoch, len(data)), data, 'r-')
+  plt.plot(np.linspace(1, epoch, len(data)), data, 'ro-' if epoch == len(data) else 'r-')
   plt.axhline(y=data[-1], color='black', linestyle='--')
   plt.text(1.01, data[-1] + 0.01, str(data[-1]))
   if not os.path.exists('picture'):
