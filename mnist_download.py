@@ -27,34 +27,31 @@ def loadData(file_name, offset):
         data = np.frombuffer(f.read(), np.uint8, offset=offset)
     return data
 
-def toOneHot(label):
-    one_hot = np.zeros((label.size, 10))
-    for i in range(label.size):
-        one_hot[i][label[i]] = 1
-    return one_hot
-
 def attachNoise(p, data):
     return np.where(np.random.uniform(0, 1, data.size).reshape(-1, 28, 28) < p, np.random.uniform(0, 1, data.size).reshape(-1, 28, 28), data)
 
 def makeDataset():
     dataset = {}
     dataset['train_img'] = loadData(key_file['train_img'], 16).reshape(-1, 28, 28).astype(np.float32) / 255 
-    dataset['train_label'] = toOneHot(loadData(key_file['train_label'], 8))
+    dataset['train_label'] = loadData(key_file['train_label'], 8)
 
     dataset['test_img'] = loadData(key_file['test_img'], 16).reshape(-1, 28, 28).astype(np.float32) / 255
-    dataset['test_label'] = toOneHot(loadData(key_file['test_label'], 8))
+    dataset['test_label'] = loadData(key_file['test_label'], 8)
     return dataset
 
 def showExample(dataset):
     print('train shape')
     print(dataset['train_img'].shape)
     print(dataset['train_label'].shape)
+    print('test shape')
+    print(dataset['test_img'].shape)
+    print(dataset['test_label'].shape)
     print('')
     print('train[0] img & label')
     print(dataset['train_label'][0])
     example = dataset['train_img'][0]
-    plt.imshow(example)
-    plt.show()
+    # plt.imshow(example)
+    # plt.show()
 
 def savePickle(file_name, dataset):
     if not os.path.exists('data'):
@@ -66,13 +63,13 @@ if __name__ == '__main__':
     downloadZip()
 
     dataset = makeDataset()
-    # showExample(dataset)
+    showExample(dataset)
     savePickle('mnist.pkl', dataset)
 
     for p in [0.05, 0.10, 0.15, 0.20, 0.25]:
         dataset_noise = dataset.copy()
         dataset_noise['train_img'] = attachNoise(p, dataset_noise['train_img'])
-        # showExample(dataset_noise)
+        showExample(dataset_noise)
         savePickle('mnist_noise_' + str(int(p * 100)) + '.pkl', dataset_noise)
 
     removeZip()
