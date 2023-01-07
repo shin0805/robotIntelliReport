@@ -28,14 +28,14 @@ def loadData(file_name, offset):
     return data
 
 def attachNoise(p, data):
-    return np.where(np.random.uniform(0, 1, data.size).reshape(-1, 28, 28) < p, np.random.uniform(0, 1, data.size).reshape(-1, 28, 28), data)
+    return np.where(np.random.uniform(0, 1, data.size).reshape(-1, 1, 28, 28) < p, np.random.uniform(0, 1, data.size).reshape(-1, 1, 28, 28), data)
 
 def makeDataset():
     dataset = {}
-    dataset['train_img'] = loadData(key_file['train_img'], 16).reshape(-1, 28, 28).astype(np.float32) / 255 
+    dataset['train_img'] = loadData(key_file['train_img'], 16).reshape(-1, 1, 28, 28).astype(np.float32) / 255 
     dataset['train_label'] = loadData(key_file['train_label'], 8)
 
-    dataset['test_img'] = loadData(key_file['test_img'], 16).reshape(-1, 28, 28).astype(np.float32) / 255
+    dataset['test_img'] = loadData(key_file['test_img'], 16).reshape(-1, 1, 28, 28).astype(np.float32) / 255
     dataset['test_label'] = loadData(key_file['test_label'], 8)
     return dataset
 
