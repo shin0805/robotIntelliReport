@@ -64,7 +64,7 @@ def showExample(data_name, dataset):
   print('label ' + label)
   example = dataset['train_img'][0].reshape(28, 28)
   plt.title(data_name)
-  plt.imshow(example)
+  plt.imshow(example, cmap='gray')
   if not os.path.exists('picture'):
     os.makedirs('picture')
   plt.savefig(file_name)
