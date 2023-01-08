@@ -24,7 +24,7 @@ def softmax_cross_entropy(y, t):
 def getArgs():
   parser = argparse.ArgumentParser()
   parser.add_argument('--name', '-nm', default='example', help='the name of trial')
-  parser.add_argument('--noise', '-ns', default=0, type=int, help='the probability of noise [%]')
+  parser.add_argument('--noise', '-ns', default=0, type=int, help='the probability of noise [%%]')
   return parser.parse_args()
 
 

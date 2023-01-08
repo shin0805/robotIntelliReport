@@ -12,7 +12,7 @@ class Runner():
   def __init__(self):
     self.args = getArgs()
     self.trial_name = self.args.name if self.args.noise == 0 else self.args.name + '_' + str(
-        args.noise) + '%_noise'
+        self.args.noise) + '%_noise'
     self.model = self.genModel()
     self.classifier = Classifier(self.model)
     self.train, self.test = getMNIST(self.args.noise)
