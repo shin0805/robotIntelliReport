@@ -1,4 +1,5 @@
 import time
+import sys
 
 import numpy as np
 
@@ -6,67 +7,75 @@ from model import *
 from util import getArgs, getMNIST, plotResult
 
 
-def genClassifier():
-  model = Sequential()
-  model.addLayer(ConvolutionLayer(1, 4))
-  model.addLayer(ReLULayer())
-  model.addLayer(AvgPoolingLayer(4))
-  model.addLayer(FlattenLayer())
-  model.addLayer(LinearLayer(7 * 7 * 4, 10))
-  return Classifier(model)
+class Runner():
 
+  def __init__(self):
+    self.args = getArgs()
+    self.trial_name = self.args.name if self.args.noise == 0 else self.args.name + '_' + str(
+        args.noise) + '%_noise'
+    self.model = self.genModel()
+    self.classifier = Classifier(self.model)
+    self.train, self.test = getMNIST(self.args.noise)
+    self.batchsize = 100  # 100
+    self.n_train = 60000  # 60000
+    self.n_test = 10000  # 10000
+    self.epoch = 5
 
-if __name__ == '__main__':
-  args = getArgs()
+    self.train_acc = []
+    self.test_acc = []
+    self.train_loss = []
+    self.test_loss = []
+    self.epoch_time = [0]
 
-  trial_name = args.name if args.noise == 0 else args.name + '_' + str(args.noise) + '%_noise'
+  def genModel(self):
+    model = Sequential()
+    model.addLayer(ConvolutionLayer(1, 4))
+    model.addLayer(ReLULayer())
+    model.addLayer(AvgPoolingLayer(4))
+    model.addLayer(FlattenLayer())
+    model.addLayer(LinearLayer(7 * 7 * 4, 10))
+    return model
 
-  classifier = genClassifier()
+  def training(self):
+    start = time.time()
+    rand_ids = np.random.permutation(self.n_train)
+    for it in range(0, self.n_train, self.batchsize):
+      ids = rand_ids[it:it + self.batchsize]
+      it_start = time.time()
+      loss, acc = self.classifier.update(self.train[0][ids], self.train[1][ids])
+      sys.stdout.write('\r' + '[train] elapsed time %f, loss %f, acc %f (%d%%)' %
+                       (time.time() - it_start, loss, acc, 100 * (it // self.batchsize) /
+                        ((self.n_train - 1) // self.batchsize)))
+      sys.stdout.flush()
+      self.train_acc.append(acc)
+      self.train_loss.append(loss)
+    self.epoch_time.append(self.epoch_time[-1] + time.time() - start)
 
-  train, test = getMNIST(args.noise)
-
-  epoch_time = [0]
-  train_acc = []
-  test_acc = []
-  train_loss = []
-  test_loss = []
-
-  batchsize = 100  # 100
-  n_train = 60000  # 60000
-  n_test = 10000  # 10000
-  epoch = 5
-
-  for e in range(1, epoch + 1):
-    epoch_start = time.time()
-    randinds = np.random.permutation(n_train)
-    for it in range(0, n_train, batchsize):
-      ind = randinds[it:it + batchsize]
-      x = train[0][ind]
-      t = train[1][ind]
-      start = time.time()
-      loss, acc = classifier.update(x, t)
-      end = time.time()
-      train_acc.append(acc)
-      train_loss.append(loss)
-      print('[train] epoch %d, iteration %d, elapsed time %f, loss %f, acc %f' %
-            (e, it // batchsize, end - start, loss, acc))
-    epoch_time.append(epoch_time[-1] + time.time() - epoch_start)
-
+  def inference(self):
     start = time.time()
     acc_ave = 0
     loss_ave = 0
-    for it in range(0, n_test, batchsize):
-      x = test[0][it:it + batchsize]
-      t = test[1][it:it + batchsize]
-      loss, acc = classifier.predict(x, t)
-      acc_ave += int(acc * batchsize)
+    for it in range(0, self.n_test, self.batchsize):
+      loss, acc = self.classifier.predict(self.test[0][it:it + self.batchsize],
+                                          self.test[1][it:it + self.batchsize])
+      acc_ave += acc * self.batchsize
       loss_ave += loss
-    acc_ave /= (1.0 * n_test)
-    loss_ave /= (n_test // batchsize)
-    end = time.time()
-    test_acc.append(acc_ave)
-    test_loss.append(loss_ave)
-    print('[test] epoch %d, elapsed time %f, loss %f, acc %f' %
-          (e, end - start, loss_ave, acc_ave))
+    acc_ave /= self.n_test
+    loss_ave /= (self.n_test // self.batchsize)
+    print('\n[test]  elapsed time %f, loss %f, acc %f' % (time.time() - start, loss_ave, acc_ave))
+    self.test_acc.append(acc_ave)
+    self.test_loss.append(loss_ave)
 
-  plotResult(trial_name, epoch, (train_acc, train_loss), (test_acc, test_loss), epoch_time[1:])
+  def run(self):
+    for e in range(1, self.epoch + 1):
+      print('epoch %d elapsed time %f' % (e, self.epoch_time[e - 1]))
+      self.training()
+      self.inference()
+
+
+if __name__ == '__main__':
+  runner = Runner()
+  runner.run()
+
+  plotResult(runner.trial_name, runner.epoch, (runner.train_acc, runner.train_loss),
+             (runner.test_acc, runner.test_loss), runner.epoch_time[1:])
