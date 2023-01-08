@@ -1,43 +1,43 @@
 import time
-import os
 
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
 
 from model import *
-from util import getMNIST, plotAccuracy
+from util import getArgs, getMNIST, plotResult
+
+
+def genClassifier():
+  model = Sequential()
+  model.addLayer(ConvolutionLayer(1, 4))
+  model.addLayer(ReLULayer())
+  model.addLayer(AvgPoolingLayer(4))
+  model.addLayer(FlattenLayer())
+  model.addLayer(LinearLayer(7 * 7 * 4, 10))
+  return Classifier(model)
+
 
 if __name__ == '__main__':
-  model = Sequential()
-  model.addLayer(ConvolutionLayer(1, 16))
-  model.addLayer(ReLULayer())
-  model.addLayer(ConvolutionLayer(16, 16))
-  model.addLayer(ReLULayer())
-  model.addLayer(MaxPoolingLayer(2))
-  model.addLayer(ReLULayer())
-  model.addLayer(ConvolutionLayer(16, 32))
-  model.addLayer(ReLULayer())
-  model.addLayer(ConvolutionLayer(32, 32))
-  model.addLayer(ReLULayer())
-  model.addLayer(AvgPoolingLayer(2))
-  model.addLayer(FlattenLayer())
-  model.addLayer(LinearLayer(7 * 7 * 32, 10))
-  classifier = Classifier(model)
+  args = getArgs()
 
-  train, test = getMNIST('mnist.pkl')
+  trial_name = args.name if args.noise == 0 else args.name + '_' + str(args.noise) + '%_noise'
 
+  classifier = genClassifier()
+
+  train, test = getMNIST(args.noise)
+
+  epoch_time = [0]
   train_acc = []
   test_acc = []
   train_loss = []
   test_loss = []
 
   batchsize = 100  # 100
-  n_train = 600  # 60000
-  n_test = 100  # 10000
+  n_train = 60000  # 60000
+  n_test = 10000  # 10000
   epoch = 5
 
   for e in range(1, epoch + 1):
+    epoch_start = time.time()
     randinds = np.random.permutation(n_train)
     for it in range(0, n_train, batchsize):
       ind = randinds[it:it + batchsize]
@@ -50,6 +50,7 @@ if __name__ == '__main__':
       train_loss.append(loss)
       print('[train] epoch %d, iteration %d, elapsed time %f, loss %f, acc %f' %
             (e, it // batchsize, end - start, loss, acc))
+    epoch_time.append(epoch_time[-1] + time.time() - epoch_start)
 
     start = time.time()
     acc_ave = 0
@@ -68,5 +69,4 @@ if __name__ == '__main__':
     print('[test] epoch %d, elapsed time %f, loss %f, acc %f' %
           (e, end - start, loss_ave, acc_ave))
 
-  plotAccuracy('mini_train', epoch, train_acc)
-  plotAccuracy('mini_test', epoch, test_acc)
+  plotResult(trial_name, epoch, (train_acc, train_loss), (test_acc, test_loss), epoch_time[1:])

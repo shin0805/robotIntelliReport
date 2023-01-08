@@ -37,7 +37,7 @@ def attachNoise(p, data):
       np.random.uniform(0, 1, data.size).reshape(-1, 1, 28, 28), data)
 
 
-def makeDataset():
+def genDataset():
   dataset = {}
   dataset['train_img'] = loadData(key_file['train_img'], 16).reshape(-1, 1, 28, 28).astype(
       np.float32) / 255
@@ -80,7 +80,7 @@ def savePickle(file_name, dataset):
 if __name__ == '__main__':
   downloadZip()
 
-  dataset = makeDataset()
+  dataset = genDataset()
   showExample('example', dataset)
   savePickle('mnist.pkl', dataset)
 
