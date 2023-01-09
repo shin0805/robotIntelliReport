@@ -39,7 +39,7 @@ optional arguments:
 python main.py -ns 25 -nm example
 ```
 `result/example/`に結果のグラフが出力される<br>
-`result/result.scv`に結果が書き込まれる<br>
+`result/result.csv`に結果が書き込まれる<br>
 
 ノイズを0%~25%まで付与して実験を行った後に以下のように実行するとノイズによる正答率の変化が`example/`に出力される
 ```shell
