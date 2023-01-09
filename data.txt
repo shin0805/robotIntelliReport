@@ -1,0 +1,8 @@
+readme.txtの通り、以下の方法でデータセットをダウンロードする
+
+python download_mnist.py
+
+data/にpklファイルが出力される
+picture/に画像の例が出力される
+
+(http://yann.lecun.com/exdb/mnist/)
