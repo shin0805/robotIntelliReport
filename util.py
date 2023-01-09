@@ -1,4 +1,5 @@
 import os
+import sys
 import csv
 import argparse
 
@@ -110,3 +111,39 @@ def plotTime(name, epoch, data):
   plt.text(1.01, data[-1] + 0.01, str(data[-1]))
   plt.savefig(os.path.join('result', name, 'time.jpg'))
   plt.clf()
+
+
+def plotNoise(name):
+  noise = [0, 5, 10, 15, 20, 25]
+  train = ([], [])
+  test = ([], [])
+  with open(os.path.join('result', 'result.csv')) as f:
+    reader = csv.reader(f)
+    rows = []
+    for row in reader:
+      rows.append(row)
+    for row in rows[-6:]:
+      train[0].append(row[1])
+      train[1].append(row[2])
+      test[0].append(row[3])
+      test[1].append(row[4])
+
+  i = 0
+  for data in [train[0], test[0]]:
+    plt.title('train accuracy' if i == 0 else 'test accuracy')
+    plt.xlabel('noise / %')
+    plt.ylabel('accuracy')
+    plt.xlim([0, 25])
+    plt.ylim([0, 1])
+    plt.xticks(noise)
+    plt.plot(noise, data, 'ro-')
+    print(data)
+    plt.savefig(
+        os.path.join('result', name,
+                     'train_accuracy_noise.jpg' if i == 0 else 'test_accuracy_noise.jpg'))
+    plt.clf()
+    i += 1
+
+
+if __name__ == '__main__':
+  plotNoise(sys.argv[1])

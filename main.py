@@ -16,9 +16,9 @@ class Runner():
     self.model = self.genModel()
     self.classifier = Classifier(self.model)
     self.train, self.test = getMNIST(self.args.noise)
-    self.batchsize = 100  # 100
-    self.n_train = 60000  # 60000
-    self.n_test = 10000  # 10000
+    self.batchsize = 100
+    self.n_train = 60000
+    self.n_test = 10000
     self.epoch = 5
 
     self.train_acc = []
@@ -28,12 +28,30 @@ class Runner():
     self.epoch_time = [0]
 
   def genModel(self):
+    # Simple Model
+    # model = Sequential()
+    # model.addLayer(ConvolutionLayer(1, 4))
+    # model.addLayer(ReLULayer())
+    # model.addLayer(AvgPoolingLayer(4))
+    # model.addLayer(FlattenLayer())
+    # model.addLayer(LinearLayer(7 * 7 * 4, 10))
+    # return model
+
+    # MoreLayer
     model = Sequential()
     model.addLayer(ConvolutionLayer(1, 4))
     model.addLayer(ReLULayer())
-    model.addLayer(AvgPoolingLayer(4))
+    model.addLayer(ConvolutionLayer(4, 4))
+    model.addLayer(ReLULayer())
+    model.addLayer(MaxPoolingLayer(2))
+    model.addLayer(ReLULayer())
+    model.addLayer(ConvolutionLayer(4, 8))
+    model.addLayer(ReLULayer())
+    model.addLayer(ConvolutionLayer(8, 8))
+    model.addLayer(ReLULayer())
+    model.addLayer(AvgPoolingLayer(2))
     model.addLayer(FlattenLayer())
-    model.addLayer(LinearLayer(7 * 7 * 4, 10))
+    model.addLayer(LinearLayer(7 * 7 * 8, 10))
     return model
 
   def training(self):
